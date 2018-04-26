@@ -1,0 +1,113 @@
+<html>
+<head>
+
+	<title>Login</title>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+	<!-- Latest compiled JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+	
+</head>
+
+<body class="backgroundContainer">
+	<div>
+			<nav class="navbar navbar-inverse" role="navigation" style="padding-left:100px;">
+				  <ul class="nav navbar-nav">
+					<li><a href="/">Home<span class="sr-only">(current)</span></a></li>
+				  <li id="nlogDropping" style="float: right;"><a href="/Login">Sign-In</a></li><!-- if logged out -->
+				</ul>
+			</nav>
+	</div>
+	<!-- Login Formular-->
+	<div class="wrapper">
+    <form class="form-signin">
+      <h2 class="form-signin-heading">Please login</h2>
+      <input type="text" class="form-control" id="username" name="username" placeholder="Email Address" required="" autofocus="" />
+      <input type="password" class="form-control" id="password" name="password" placeholder="Password" required=""/>
+			<div class="checkbox">
+					<label>
+							<input type="checkbox" value="remember-me" id="rememberMe" name="rememberMe"> Remember me
+					</label>
+			</div>
+      <button id="loginButton" class="btn btn-lg btn-primary" type="button">Login</button>
+	  <a href="/RegistryPage"><button class="btn btn-lg btn-primary" type="button">Sign-Up</button> </a>
+	  <div style="margin-top:10px;">
+		<p id="failedLogin"> </p>
+	  </div>
+    </form>
+  </div>
+</form>
+</div>
+<!-- Abschluss der Seite-->
+<footer class="footer">
+      <div class="container">
+        <span class="text-muted"><a href="/about">About us</a>, Copyrights, Social Media</span>
+      </div>
+</footer>
+</body>
+<script>
+$(document).ready (function ()
+{
+	// Helper-Object: set url to sfsuse or localhost
+	var ajaxURL = new AJAXSettings().getAJAXURL();
+	
+	// Add eventlistener to registration button
+	document.getElementById("loginButton").addEventListener("click", sendRegistration, true);
+
+	function sendRegistration()
+	{
+		// Get all parameters
+		var email  			= document.getElementById("username").value;
+		var password  		= document.getElementById("password").value;
+
+		// Fire ajax
+		$.ajax
+		(
+			{
+				type		: "POST",
+				url			: ajaxURL + "/fa17g17/user/login",
+				contentType	: 'application/json',
+				data		: JSON.stringify
+				(
+					{
+						"user"		: email,
+						"password"	: password
+					}
+				),
+				success		: function (data)
+				{
+					console.log("SUCCESS-CB");
+					if(data.login == "true"){
+						console.log(JSON.stringify(data));
+						localStorage.setItem('user_id', data.user.id);
+						localStorage.setItem('user_nick', data.user.user);
+						localStorage.setItem('user_firstname', data.user.firstname);
+						localStorage.setItem('user_lastname', data.user.lastname);
+						//If success then redirect to landing page
+						window.location.href = "/fa17g17";
+					} else {
+						$("#failedLogin").text(data.information);
+					}
+				},
+				error		: function (err)
+				{
+					console.log("ERROR-CB");
+					console.log(err);
+				}
+			}
+		).done
+		(
+			function ()
+			{
+				console.log("DONE-CB");
+			}
+		);
+	}
+});
+</script>
+</html>
